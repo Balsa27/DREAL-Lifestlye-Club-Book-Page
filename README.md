@@ -1,2 +1,2 @@
 # DREAL-Lifestlye-Club-Book-Page
-You will be able to find book here, weather you like them or not. 
+Here, you will be able to find a book, weather you like them or not. 
