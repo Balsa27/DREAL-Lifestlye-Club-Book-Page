@@ -6,12 +6,13 @@ function BookNavigationButton({text, isActive, hasActiveButton, onClick}) {
             <motion.div
                 className={`inner-div ${isActive ? 'active' : ''}`}
                 whileHover={{
-                    textShadow: "0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 1)",
                     fontWeight: 300
                 }}
                 animate={{
                     filter: hasActiveButton && !isActive ? 'blur(1.5px)' : 'blur(0px)',
-                    opacity: hasActiveButton && !isActive ? 0.6 : 1,
+                }}
+                initial={{
+                    color: 'white'  // Also add here to prevent flash of other color
                 }}
                 onClick={onClick}
                 transition={{

@@ -29,6 +29,7 @@ const pictures = [
     "STEVO-26",
 ];
 
+export const isAnimationCompleteAtom = atom(false);
 export const pageAtom = atom(0);
 export const pages = [
     {
