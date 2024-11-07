@@ -1,0 +1,30 @@
+﻿.outer-div {
+    width: 130px;
+    height: 65px;
+    border-radius: 80px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: transparent;
+    background-size: 400% 400%;
+    display: flex;
+    overflow: hidden;
+}
+
+.inner-div {
+    width: 114px;
+    height: 60px;
+    border-radius: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    letter-spacing: 2px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    background: linear-gradient(45deg, white, gray);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer ;
+    filter: blur(0px);
+}
