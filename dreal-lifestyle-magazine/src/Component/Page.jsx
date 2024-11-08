@@ -1,4 +1,4 @@
-﻿import {useMemo, useRef, useState} from "react";
+﻿import {useEffect, useMemo, useRef, useState} from "react";
 import {
     Bone,
     BoxGeometry,
@@ -83,11 +83,9 @@ const pageMaterials = [
     }),
 ];
 
-
 pages.forEach((page) => {
     useTexture.preload(`/textures/${page.front}.jpg`);
     useTexture.preload(`/textures/${page.back}.jpg`);
-    useTexture.preload(`/textures/book-cover-roughness.jpg`);
 })
 
 const Page = ({number, front, back, page, opened, closed, ...props}) => {
@@ -250,6 +248,10 @@ const Page = ({number, front, back, page, opened, closed, ...props}) => {
             );
         }
     });
+
+    useEffect(() => {
+        console.log("Index", number)
+    }, []);
 
     return (
         <group {...props} ref={group}>

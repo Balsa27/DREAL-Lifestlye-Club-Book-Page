@@ -1,4 +1,4 @@
-﻿import React, {useRef, useState} from 'react';
+﻿import React, {useEffect, useRef, useState} from 'react';
 import { useFrame } from '@react-three/fiber';
 import Magazine from "./Magazine";
 import MouseTiltMesh from "./MouseTiltMesh";
@@ -6,9 +6,10 @@ import * as THREE from "three";
 import {useAtom} from "jotai";
 import {isAnimationCompleteAtom, pageAtom} from "./Util";
 
+//move the camera to its own component to reduce one render
+//with that I`ll get down to only one render
 function Scene() {
     const [, setIsAnimationComplete] = useAtom(isAnimationCompleteAtom);
-    const [, setPage] = useAtom(pageAtom);
     const [isMoving, setIsMoving] = useState(true);
     const cameraPosition = useRef({ x: -6, y: -3, z: 8 });
     const progress = useRef(0);
@@ -19,7 +20,7 @@ function Scene() {
 
             const t = Math.min(progress.current, 1);
             // Enhanced curve movement
-            const curve = Math.sin(t * Math.PI) * 1.2; // Increased amplitude
+            const curve = Math.sin(t * Math.PI) * 1.4; // Increased amplitude
 
             // More dramatic path
             cameraPosition.current.x = THREE.MathUtils.lerp(-4, 0, t); // Start from -4 instead of -2
@@ -40,6 +41,10 @@ function Scene() {
                     setIsAnimationComplete(true);
             }
         }
+    });
+
+    useEffect(() => {
+        console.log("RRRRREND")
     });
     
     return (

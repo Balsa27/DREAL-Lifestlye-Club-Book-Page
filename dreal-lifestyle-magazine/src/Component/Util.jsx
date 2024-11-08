@@ -11,9 +11,7 @@ const pictures = [
     "STEVO-08",
     "STEVO-09",
     "STEVO-10",
-    "STEVO-11",
-    "STEVO-12",
-    "STEVO-13",
+    "STEVO-13", 
     "STEVO-14",
     "STEVO-15",
     "STEVO-16",
@@ -30,6 +28,7 @@ const pictures = [
 ];
 
 export const isAnimationCompleteAtom = atom(false);
+export const isMeshRenderingAtom = atom(true);
 export const pageAtom = atom(0);
 export const pages = [
     {

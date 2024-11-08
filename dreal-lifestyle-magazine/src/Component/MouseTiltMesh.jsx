@@ -1,11 +1,14 @@
 ﻿import {useFrame, useThree} from "@react-three/fiber";
 import {useEffect, useRef, useState} from "react";
 import * as THREE from "three";
+import {useAtom} from "jotai";
+import {isMeshRenderingAtom} from "./Util";
 
 function MouseTiltMesh({ children }) {
     const ref = useRef();
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { viewport } = useThree();
+    const [isMeshRendering, setIsMeshRendering] = useAtom(isMeshRenderingAtom);
 
     useEffect(() => {
         const handleMouseMove = (event) => {
@@ -14,9 +17,13 @@ function MouseTiltMesh({ children }) {
                 y: -(event.clientY / window.innerHeight) * 2 + 1
             });
         };
-
+        
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    useEffect(() => {
+        console.log('MouseTiltMesh mounted');
     }, []);
 
     useFrame((state) => {
@@ -37,7 +44,13 @@ function MouseTiltMesh({ children }) {
         );
     });
 
-    return <mesh ref={ref}>{children}</mesh>;
+    const handleAfterRender = (e) => {
+        if (isMeshRendering) {
+            setIsMeshRendering(false);
+        }
+    };
+    
+    return <mesh onAfterRender={handleAfterRender} ref={ref}>{children}</mesh>;
 }
 
 export default MouseTiltMesh;
