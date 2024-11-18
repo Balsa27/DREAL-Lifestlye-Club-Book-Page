@@ -1,0 +1,7 @@
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.csproj.AssemblyReference.cache
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.AssemblyInfoInputs.cache
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.AssemblyInfo.cs
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.csproj.CoreCompileInputs.cache
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\balsa\RiderProjects\MagazineBackend\MagazineBackend\obj\Debug\net8.0\MagazineBackend.MvcApplicationPartsAssemblyInfo.cache

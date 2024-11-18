@@ -1,0 +1,6 @@
+@MagazineBackend_HostAddress = http://localhost:5078
+
+GET {{MagazineBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
