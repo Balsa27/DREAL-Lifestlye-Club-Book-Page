@@ -1,6 +1,7 @@
 using System.Text;
 using MagazineBackend.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -50,6 +51,31 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
+builder.Services.AddResponseCaching();
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(outputCachePolicyBuilder =>
+        outputCachePolicyBuilder.Cache()
+            .SetVaryByHeader("Accept")
+            .Expire(TimeSpan.FromDays(30)));
+});
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -92,14 +118,33 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (builder.Environment.IsDevelopment())
 {
+    app.UseCors(b =>
+    {
+        b.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(cors => cors
+    .WithOrigins(builder.Configuration
+        .GetSection("Cors:AllowedOrigins"!).Value!
+        .Split(","))
+    .AllowAnyHeader()
+    .AllowAnyMethod());
 
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseResponseCompression();
+app.UseResponseCaching();
+app.UseOutputCache();
+app.UseStaticFiles();
+app.UseRouting();
+app.MapControllers();
 
 app.Run();

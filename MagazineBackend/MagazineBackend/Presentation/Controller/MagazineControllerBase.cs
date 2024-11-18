@@ -1,11 +1,18 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MagazineBackend.Presentation;
+namespace MagazineBackend.Presentation.Controller;
 
 public class MagazineControllerBase : ControllerBase
 {
     protected Guid UserId => GetCurrentUserId();
+    protected string Host => GetHostName();
+
+    private string GetHostName()
+    {
+        var request = HttpContext.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 
     private Guid GetCurrentUserId()
     {
