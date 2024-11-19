@@ -7,10 +7,10 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace MagazineBackend.Application;
 
-public class ContentDeliveryService
+public class MagazinePageService
 {
     private readonly IMemoryCache _cache;
-    private readonly ILogger<ContentDeliveryService> _logger;
+    private readonly ILogger<MagazinePageService> _logger;
     private readonly SemaphoreSlim _uploadSemaphore;
     private readonly string _uploadPath;
     private const int MaxFileSizeMb = 10;
@@ -22,9 +22,9 @@ public class ContentDeliveryService
         "image/jpeg"
     ];
 
-    public ContentDeliveryService(
+    public MagazinePageService(
         IMemoryCache cache,
-        ILogger<ContentDeliveryService> logger,
+        ILogger<MagazinePageService> logger,
         IWebHostEnvironment environment,
         IConfiguration configuration,
         MagazineContext db)

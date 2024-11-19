@@ -1,4 +1,7 @@
 using System.Text;
+using MagazineBackend.Application;
+using MagazineBackend.Domain.Abstraction;
+using MagazineBackend.Presentation.Middleware;
 using MagazineBackend.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -47,6 +50,11 @@ builder.Services.AddDbContext<MagazineContext>((sp, ob) =>
     ob.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"!));
 });
 
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<MagazinePageService>();
+builder.Services.AddScoped<MagazineService>();
+builder.Services.AddScoped<AuthenticationService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
@@ -74,7 +82,6 @@ builder.Services.AddRouting(options =>
     options.LowercaseUrls = true;
     options.LowercaseQueryStrings = true;
 });
-
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -118,6 +125,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (builder.Environment.IsDevelopment())
 {
     app.UseCors(b =>
@@ -144,6 +153,7 @@ app.UseResponseCompression();
 app.UseResponseCaching();
 app.UseOutputCache();
 app.UseStaticFiles();
+app.UseMiddleware<TimestampMiddleware>();
 app.UseRouting();
 app.MapControllers();
 
