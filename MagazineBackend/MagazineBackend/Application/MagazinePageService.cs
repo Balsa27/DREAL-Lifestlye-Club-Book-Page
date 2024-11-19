@@ -42,12 +42,12 @@ public class MagazinePageService
         EnsureDirectoryExists(_uploadPath);
     }
 
-    public async Task<(string url, string fileName)> UploadMagazineImageAsync(UploadMagazineImageRequest request, Guid userId, string host)
+    public async Task<(string url, string fileName)> UploadMagazineImageAsync(UploadMagazineImageRequest request,
+        Guid userId, string host)
     {
+        await _uploadSemaphore.WaitAsync();
         try
         {
-            await _uploadSemaphore.WaitAsync();
-
             if (request.File == null || request.File.Length == 0)
             {
                 _logger.LogError("No file provided");
@@ -84,15 +84,13 @@ public class MagazinePageService
 
                 if (!File.Exists(filePath))
                 {
-                    await using (var stream = new FileStream(
-                                     filePath,
-                                     FileMode.Create,
-                                     FileAccess.Write,
-                                     FileShare.None))
-                    {
-                        await request.File.CopyToAsync(stream);
-                    }
+                    await using var stream = new FileStream(
+                        filePath,
+                        FileMode.Create,
+                        FileAccess.Write,
+                        FileShare.None);
 
+                    await request.File.CopyToAsync(stream);
                     _logger.LogInformation("File {FileName} uploaded successfully to {Path}", fileName, filePath);
                 }
                 else
@@ -106,31 +104,27 @@ public class MagazinePageService
                 magazine.PageUrls.Add(fullFilePath);
                 _db.Update(magazine);
                 await _db.SaveChangesAsync();
-                
-                _logger.LogInformation($"Added a new page to the magazine with the id: {magazine.Id}, pageUrl: {fullFilePath}");
+
+                _logger.LogInformation(
+                    $"Added a new page to the magazine with the id: {magazine.Id}, pageUrl: {fullFilePath}");
 
                 await transaction.CommitAsync();
-
                 return (fullFilePath, fileName);
             }
-            catch (Exception)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
             }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error uploading file");
-            throw;
         }
         finally
         {
             _uploadSemaphore.Release();
         }
     }
-    
-    public async Task<(byte[] fileBytes, string contentType, string etag)?> GetMagazineImage(GetMagazineImageRequest request, Guid userId, string host)
+
+    public async Task<(byte[] fileBytes, string contentType, string etag)?> GetMagazineImage(
+        GetMagazineImageRequest request, Guid userId, string host)
     {
         var magazine = await _db.Magazines
             .AsNoTracking()
@@ -139,19 +133,18 @@ public class MagazinePageService
 
         if (magazine is null)
         {
-            _logger.LogError($"Magazine with the id: {request.MagazineId} and userID: {userId} was not found while attempting to get teh magazine image.");
-            throw new InvalidOperationException("Magazine not found.");
+            _logger.LogError($"Magazine with the id: {request.MagazineId} and userID: {userId} was not found");
+            throw new EntityNotFoundException(typeof(Magazine));
         }
-        
+
         var fullPath = $"{host}/{request.RelativePath}".TrimEnd('/');
 
         if (!magazine.PageUrls.Contains(fullPath))
         {
-            _logger.LogError($"Magazine with the id: {request.MagazineId} and userID: {userId} was not found while attempting to get teh magazine image.");
-            throw new EntityNotFoundException(
-                $"Page with the url: {request.RelativePath} was not found in the magazine with the id: {request.MagazineId} instantiated by the user with id: {userId}");
+            _logger.LogError($"Page not found in magazine {request.MagazineId}");
+            throw new EntityNotFoundException($"Page not found in magazine {request.MagazineId}");
         }
-        
+
         var cacheKey = $"img_{request.RelativePath}";
 
         if (_cache.TryGetValue<(byte[], string, string)>(cacheKey, out var cachedImage))
@@ -166,36 +159,28 @@ public class MagazinePageService
             return null;
         }
 
-        try
+        var bytes = await File.ReadAllBytesAsync(fullPath);
+        var contentType = "image/jpeg";
+        var etag = $"\"{Path.GetFileName(request.RelativePath)}\"";
+
+        var result = (bytes, contentType, etag);
+
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromHours(1))
+            .SetAbsoluteExpiration(TimeSpan.FromHours(24));
+
+        if (bytes.Length > 5 * 1024 * 1024) // 5MB
         {
-            var bytes = await File.ReadAllBytesAsync(fullPath);
-            var contentType = "image/jpeg";
-            var etag = $"\"{Path.GetFileName(request.RelativePath)}\"";
-
-            var result = (bytes, contentType, etag);
-
-            var cacheOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromHours(1))
-                .SetAbsoluteExpiration(TimeSpan.FromHours(24));
-
-            if (bytes.Length > 5 * 1024 * 1024) // 5MB
-            {
-                cacheOptions.SetSlidingExpiration(TimeSpan.FromMinutes(30))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(6));
-            }
-
-            cacheOptions.SetSize(bytes.Length);
-
-            _cache.Set(cacheKey, result, cacheOptions);
-            _logger.LogInformation("File {Path} cached", request.RelativePath);
-
-            return result;
+            cacheOptions.SetSlidingExpiration(TimeSpan.FromMinutes(30))
+                .SetAbsoluteExpiration(TimeSpan.FromHours(6));
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error reading file {Path}", fullPath);
-            return null;
-        }
+
+        cacheOptions.SetSize(bytes.Length);
+
+        _cache.Set(cacheKey, result, cacheOptions);
+        _logger.LogInformation("File {Path} cached", request.RelativePath);
+
+        return result;
     }
 
     private void EnsureDirectoryExists(string path)
