@@ -1,0 +1,56 @@
+﻿.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 400px;
+    z-index: 50;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    background-color: transparent;
+    background-image:
+            repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.03) 0px, transparent 1px),
+            repeating-radial-gradient(circle at 32% 75%, rgba(255, 255, 255, 0.03) 0px, transparent 1px),
+            repeating-radial-gradient(circle at 69% 18%, rgba(255, 255, 255, 0.03) 0px, transparent 1px),
+            repeating-radial-gradient(circle at 83% 60%, rgba(255, 255, 255, 0.03) 0px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.sidebar > div {
+    height: 100%;
+    position: relative;
+}
+
+.titles-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-left: 60px;
+}
+.sidebar-line {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.12) 20%,
+            rgba(255, 255, 255, 0.25) 50%,
+            rgba(255, 255, 255, 0.12) 80%,
+            rgba(255, 255, 255, 0) 100%
+    );
+    transform-origin: top;
+}
+
+.title-item {
+    color: white;   
+    font-size: 20px;
+    font-weight: 700;
+    margin: 30px 0;
+    letter-spacing: 5px;
+    cursor: pointer;
+    display: flex;
+    font-family: 'Montserrat', sans-serif;
+}

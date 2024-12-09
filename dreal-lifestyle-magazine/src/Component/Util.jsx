@@ -27,6 +27,9 @@ const pictures = [
     "STEVO-26",
 ];
 
+export const lerpCameraForSidebar = atom(false);
+export const closeBottomNavigationAtom = atom(false);
+export const closeAfterDeleteAtom = atom(false);
 export const isAnimationCompleteAtom = atom(false);
 export const isMeshRenderingAtom = atom(true);
 export const pageAtom = atom(0);
@@ -53,7 +56,7 @@ export const UI = () => {
     const [page, setPage] = useAtom(pageAtom);
 
     useEffect(() => {
-        const audio = new Audio("/audios/page-flip-01a.mp3");
+        const audio = new Audio("/audios/flipp.mp3");
         audio.play().then(r => console.log('Playing.'));
     }, [page]);
 }

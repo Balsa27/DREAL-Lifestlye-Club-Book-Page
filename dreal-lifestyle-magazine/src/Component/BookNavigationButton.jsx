@@ -12,7 +12,7 @@ function BookNavigationButton({text, isActive, hasActiveButton, onClick}) {
                     filter: hasActiveButton && !isActive ? 'blur(1.5px)' : 'blur(0px)',
                 }}
                 initial={{
-                    color: 'white'  // Also add here to prevent flash of other color
+                    color: 'white'  
                 }}
                 onClick={onClick}
                 transition={{

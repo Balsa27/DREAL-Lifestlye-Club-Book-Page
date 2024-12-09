@@ -1,23 +1,12 @@
-import './App.css';
-import { useState, useEffect } from 'react';
-import MagazineNavigation from "./Component/MagazineNavigation";
-import logo from "./Assets/logo_final_shape.svg";
-import InteractiveCanvas from "./Component/InteractiveCanvas";
-import DottedBackground from "./Component/DottedBackground";
-import LoadingTransition from "./Component/LoadingTransition";
+import {AuthProvider} from "./Context/AuthProvider";
+import {AppContent} from "./Component/AppContent";
+
 
 function App() {
     return (
-        <>
-            <div className="app">
-                <img src={logo} alt="logo" className="logo"/>
-                <div className="main">
-                    <InteractiveCanvas />
-                </div>
-                <MagazineNavigation />
-            </div>
-            <LoadingTransition logo={logo} />
-        </>
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     );
 }
 

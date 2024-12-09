@@ -4,29 +4,29 @@ import Magazine from "./Magazine";
 import MouseTiltMesh from "./MouseTiltMesh";
 import * as THREE from "three";
 import {useAtom} from "jotai";
-import {isAnimationCompleteAtom, pageAtom} from "./Util";
+import {isAnimationCompleteAtom, lerpCameraForSidebar, pageAtom} from "./Util";
 
 //move the camera to its own component to reduce one render
 //with that I`ll get down to only one render
 function Scene() {
     const [, setIsAnimationComplete] = useAtom(isAnimationCompleteAtom);
-    const [isMoving, setIsMoving] = useState(true);
+    const [moveCamera, setMoveCamera] = useAtom(lerpCameraForSidebar);
+    const [isMoving, setIsMoving] = useState(true); 
     const cameraPosition = useRef({ x: -6, y: -3, z: 8 });
     const progress = useRef(0);
+    const sidebarProgress = useRef(0);
+    const [lightIntensity, setLightIntensity] = useState(3.5);  
 
     useFrame(({ camera }) => {
         if (isMoving) {
             progress.current += 0.012;
 
             const t = Math.min(progress.current, 1);
-            // Enhanced curve movement
-            const curve = Math.sin(t * Math.PI) * 1.4; // Increased amplitude
+            const curve = Math.sin(t * Math.PI) * 1.4; 
 
-            // More dramatic path
-            cameraPosition.current.x = THREE.MathUtils.lerp(-4, 0, t); // Start from -4 instead of -2
-            cameraPosition.current.y = THREE.MathUtils.lerp(-3, 0, t) + curve; // Start from -3, bigger curve
-            cameraPosition.current.z = THREE.MathUtils.lerp(6, 4, t); // Start further back
-
+            cameraPosition.current.x = THREE.MathUtils.lerp(-4, 0, t);
+            cameraPosition.current.y = THREE.MathUtils.lerp(-3, 0, t) + curve; 
+            cameraPosition.current.z = THREE.MathUtils.lerp(6, 4, t); 
 
             camera.position.set(
                 cameraPosition.current.x,
@@ -41,6 +41,18 @@ function Scene() {
                     setIsAnimationComplete(true);
             }
         }
+
+        if (moveCamera) {
+            sidebarProgress.current = Math.min(sidebarProgress.current + 0.015, 1);
+            const eased = (1 - Math.cos(sidebarProgress.current * Math.PI)) / 2;
+            const newIntensity = THREE.MathUtils.lerp(3.5, 0, eased);
+            setLightIntensity(newIntensity);
+        } else {
+            sidebarProgress.current = Math.max(sidebarProgress.current - 0.015, 0);
+            const eased = (1 - Math.cos(sidebarProgress.current * Math.PI)) / 2;
+            const newIntensity = THREE.MathUtils.lerp(3.5, 0, eased);
+            setLightIntensity(newIntensity);
+        }
     });
 
     useEffect(() => {
@@ -50,18 +62,27 @@ function Scene() {
     return (
         <>
             <directionalLight
+                intensity={lightIntensity}
                 position={[2, 5, 2]}
-                intensity={3.5}
                 castShadow
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}
                 shadow-bias={-0.0001}
             />
 
+            <directionalLight
+                position={[5, 2, 2]}
+                // Reduced from 2 to 0.3 for barely visible state
+                intensity={moveCamera ? 0 : 0.3}
+                castShadow={false}
+            />
+
             <pointLight
-                intensity={5}
+                // Reduced from 5 to 2 for overall dimmer scene
+                intensity={2}
                 position={[0, 0, 5]}
             />
+
 
             <MouseTiltMesh>
                 <Magazine />

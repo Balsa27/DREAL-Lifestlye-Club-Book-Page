@@ -1,0 +1,60 @@
+﻿import {motion, AnimatePresence, useScroll} from 'framer-motion';
+import '../Styles/Sidebar.css';
+import MagazineItem from "./MagazineItem";
+import CustomScroll from "./ScrollView";
+
+const lineVariants = {
+    initial: {
+        scaleY: 0,
+        originY: 0
+    },
+    animate: {
+        scaleY: 1,
+        transition: {
+            duration: 0.8,
+            delay: 0.3
+        }
+    },
+    exit: {
+        scaleY: 0,
+        originY: 1,
+        transition: { duration: 0.8 }
+    }
+};
+
+const Sidebar = ({ isOpen }) => {
+    const { scrollYProgress } = useScroll();
+
+    return (
+        <motion.div
+            className="sidebar"
+            initial={{ x: "100%" }}
+            animate={{ x: isOpen ? 0 : "100%" }}
+            transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+            }}
+        >
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        <motion.div className="sidebar-line" variants={lineVariants}/>
+                        <div className="sidebar-content">
+                            <h2 className="sidebar-title">Your Collection...</h2>
+                            <CustomScroll>
+                                <div className="magazines-grid">
+                                    {[1,2,3,4,5,6,7,8].map(id => (
+                                        <MagazineItem key={id} id={id} />
+                                    ))}
+                                </div>
+                            </CustomScroll>
+                        </div>
+                    </>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+};
+
+export default Sidebar;

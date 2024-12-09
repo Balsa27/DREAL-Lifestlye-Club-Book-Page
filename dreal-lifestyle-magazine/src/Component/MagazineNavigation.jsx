@@ -2,13 +2,14 @@
 import BookNavigationButton from "./BookNavigationButton";
 import {useEffect, useState} from "react";
 import {useAtom} from "jotai";
-import {isAnimationCompleteAtom, pageAtom} from "./Util";
+import {closeBottomNavigationAtom, isAnimationCompleteAtom, pageAtom} from "./Util";
 import {pages} from './Util';
 import {motion} from "framer-motion";
 
 function MagazineNavigation() {
     const [page, setPage] = useAtom(pageAtom);
     const [isAnimationComplete] = useAtom(isAnimationCompleteAtom);
+    const [shouldCloseBottomNav] = useAtom(closeBottomNavigationAtom);
     const [activeButton, setActiveButton] = useState(null);
     const [currentNumber, setCurrentNumber] = useState(1);
 
@@ -69,7 +70,18 @@ function MagazineNavigation() {
     };
 
     return (
-        <div className="nav">
+        <motion.div
+            className="nav"
+            initial={{ opacity: 1, y: 0 }}
+            animate={{
+                opacity: shouldCloseBottomNav ? 0 : 1,
+                y: shouldCloseBottomNav ? 100 : 0
+            }}
+            transition={{
+                duration: 0.5,
+                ease: "easeInOut"
+            }}
+        >
             <div className="nav-buttons">
                 <BookNavigationButton
                     text="FRONT"
@@ -112,7 +124,7 @@ function MagazineNavigation() {
                     onClick={() => handlePageChange(lastPage)}
                 />
             </div>
-        </div>
+        </motion.div>
     );
 }
 
